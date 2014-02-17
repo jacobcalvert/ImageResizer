@@ -1,7 +1,7 @@
 ###########################################
 # File:         ImageResizer.py
 # Rev:          1.0
-# Usage:        ''
+# Usage:        'ImageResizer.py src_dir dest_dir scale'
 # Dependencies: Image, os, sys, time
 ###########################################
 import Image
@@ -10,12 +10,18 @@ import sys
 import time
 
 
-EXTS = [".jpg", ".png", ".gif", ".tiff"]
 TESTING = 0
 
+EXTS = [".jpg", ".png", ".gif", ".tiff", ".bmp"]
 AVG = 0
+AVG_FULL = []
+PLATFORM = None
+CLS_PARAMS = {"nt": "cls", "posix": "clear"}
+CLS = None
+
 
 def main():
+    setup_params()
     if len(sys.argv) == 4:
         source_folder = sys.argv[1]
         destination_folder = sys.argv[2]
@@ -49,7 +55,7 @@ def scan_dir(src_dir):
 def work_loop(source, destination, scale):
     files = scan_dir(source)
     t0 = time.time()
-    i = 0
+    i = 1
     t = len(files)
     for f in files:
         src = source+"/"+f
@@ -70,7 +76,6 @@ def get_destination_folder():
 def resize(src, dest, scale=0.5):
     t0 = time.time()
     orig = Image.open(src)
-
     w = int(orig.size[0]*scale)
     h = int(orig.size[1]*scale)
 
@@ -89,15 +94,15 @@ def ftime(t):
         return "0m%ds" % (t)
 
 
-def info_callback(t0, i, t, fn,avg):
+def info_callback(t0, i, t, fn, avg):
     delta_t = int(time.time() - t0)
-    os.system("clear")  # TODO: check for WIN32 or Linux, should be either 'cls' or clear
+    os.system(CLS)
     pct = (i/float(t))*100
     print "Job Info"
-    print "     %-30s %s" % ("Current File: ", fn)
+    print "     %-30s %-20s (file %d of %d)" % ("Current File: ", fn, i, t)
     print "     %-30s %.2f%%" % ("Percent Complete: ", pct)
     print "     %-30s %s" % ("Elapsed Time: ", ftime(delta_t))
-    print "     %-30s %s" % ("Estimated time to completion: ", time_to_completion(t-i))  # TODO: take avg of each file, estimate ETA
+    print "     %-30s %s" % ("Estimated time to completion: ", time_to_completion(t-i))
     print "     %-30s %.2fs" % ("Average time per file: ", avg)
 
 
@@ -106,11 +111,17 @@ def time_to_completion(left):
 
 
 def calc_avg(t0, t1):
-    global AVG
-    if AVG == 0:
-        AVG = t1 - t0
-    else:
-        AVG = ((t1 - t0) + AVG) / 2.0
+    global AVG, AVG_FULL
+    AVG_FULL.append(t1-t0)
+    AVG = sum(AVG_FULL)/float(len(AVG_FULL))
+
+
+def setup_params():
+    global PLATFORM, CLS, CLS_PARAMS
+    PLATFORM = os.name
+    CLS = CLS_PARAMS[PLATFORM]
+
+
 def tests():
     if test_ftime():
         print "ftime() passed."
