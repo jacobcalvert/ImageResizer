@@ -2,9 +2,20 @@
 # File:         ImageResizer.py
 # Rev:          1.0
 # Usage:        'ImageResizer.py src_dir dest_dir scale'
-# Dependencies: Image, os, sys, time
+# Dependencies: PIL, os, sys, time
 ###########################################
-import Image
+
+
+def fatal(event):
+    print "Fatal Event occurred."
+    print "Event Description: %s" % (event)
+    print "Exiting.."
+    exit()
+try:
+    import Image
+except Exception, err:
+    fatal("Could not import Image - %s" % (err))
+
 import os
 import sys
 import time
@@ -66,11 +77,15 @@ def work_loop(source, destination, scale):
 
 
 def get_source_folder():
-    pass # TODO: add a tK gui folder browser
+    pass  # TODO: add a tK gui folder browser
 
 
 def get_destination_folder():
-    pass # TODO: add a tK gui folder browser
+    pass  # TODO: add a tK gui folder browser
+
+
+def get_scale():
+    pass  # TODO: add a tK gui input for scaling factor
 
 
 def resize(src, dest, scale=0.5):
@@ -122,12 +137,20 @@ def setup_params():
     CLS = CLS_PARAMS[PLATFORM]
 
 
+def fatal(event):
+    print "Fatal Event occurred."
+    print "Event Description: %s" % (event)
+    print "Exiting.."
+    exit()
+
+
 def tests():
+    setup_params()
     if test_ftime():
         print "ftime() passed."
     print "------------------VISUAL VERIFICATION---------------------------"
-    info_callback(time.time() - 100, 2, 125, "test-file.ext")
-
+    info_callback(time.time() - 100, 2, 125, "test-file.ext", AVG)
+    fatal("Testing event")
 
 def test_ftime():
     if ftime(100) == "1m40s":
