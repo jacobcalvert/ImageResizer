@@ -1,23 +1,37 @@
 ###########################################
-# File:     ImageResizer.py
-# Rev:      1.0
-# Usage:    ''
-#
+# File:         ImageResizer.py
+# Rev:          1.0
+# Usage:        ''
+# Dependencies: Image, os, sys, time
 ###########################################
 import Image
 import os
 import sys
 import time
 
+
 EXTS = [".jpg", ".png", ".gif", ".tiff"]
+TESTING = 0
 
 def main():
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 4:
         source_folder = sys.argv[1]
         destination_folder = sys.argv[2]
-        work_loop(source_folder, destination_folder, 0.5)
+        scale = float(sys.argv[3])
+        if not os.path.exists(source_folder):
+            print "ERROR: Source not found."
+            return
+        if not os.path.exists(destination_folder):
+            print "Warning: Destination folder not found, creating it."
+            os.makedirs(destination_folder)
+        work_loop(source_folder, destination_folder, scale)
     else:
-        pass
+        usage()
+
+
+def usage():
+    print "ImageResizer.py src_dir dest_dir scale"
+    print "EX: 'ImageResizer.py ./in/ ./out/ 0.6' would resize all images in 'in' down to 60% and put them in 'out'"
 
 
 def scan_dir(src_dir):
@@ -79,8 +93,18 @@ def info_callback(t0, i, t, fn):
     print "     %-30s %s" % ("Estimated time to completion: ", "Not implemented")  # TODO: take avg of each file, estimate ETA
 
 
-def test():
-    print ftime(100)
+def tests():
+    if test_ftime():
+        print "ftime() passed."
+    print "------------------VISUAL VERIFICATION---------------------------"
     info_callback(time.time() - 100, 2, 125, "test-file.ext")
 
-test()
+
+def test_ftime():
+    if ftime(100) == "1m40s":
+        return True
+
+if TESTING == 1:
+    tests()
+else:
+    main()
